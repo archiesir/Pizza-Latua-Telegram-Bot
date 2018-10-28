@@ -3,10 +3,10 @@
 from enum import Enum
 
 
-def product(product_):
-    title = product_['title']
-    comp = product_['comp']
-    price = product_['price']
+def product_info(product):
+    title = product['title']
+    comp = product['comp']
+    price = product['price']
     return '<b>{}</b>\n\n' \
            '{}\n\n' \
            '<b>Цена: {} руб.</b>'.format(title, comp, price)

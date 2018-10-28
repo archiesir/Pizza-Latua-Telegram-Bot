@@ -6,7 +6,7 @@ import product
 
 
 def main_menu():
-    key_main_menu = types.ReplyKeyboardMarkup(True, True)
+    key_main_menu = types.ReplyKeyboardMarkup(True)
     key_main_menu.row('🍴 Меню', '📥 Корзина')
     key_main_menu.row('🛎 Заказы', '📢 Новости')
     key_main_menu.row('🚀 Доставка', '☎ Контакты')
@@ -14,8 +14,8 @@ def main_menu():
 
 
 def categories():
-    key_categories = types.ReplyKeyboardMarkup(True, True)
-    key_categories.row('🏠 Начало', '📥 Корзина')  # Главное меню
+    key_categories = types.ReplyKeyboardMarkup(True)
+    key_categories.row('🏠 Начало', '📥 Корзина')
     key_categories.row('🍕 Пицца', '🍔 Бургеры')
     key_categories.row('🍹 Напитки', '🍝 Паста')
     key_categories.row('🥗 Салаты', '🥘 Супы')
@@ -24,7 +24,7 @@ def categories():
 
 
 def pizza():
-    key_pizza = types.ReplyKeyboardMarkup(True, row_width=3)
+    key_pizza = types.ReplyKeyboardMarkup(True, True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -85,8 +85,11 @@ def chose_amount():
     chose_btn = types.InlineKeyboardButton(text='Выберите колличество', callback_data='chose_amount')
     back_btn = types.InlineKeyboardButton(text='⬅ Назад', callback_data='back')
     chose_amount_key.add(chose_btn)
-    chose_amount_key.add(one_btn,two_btn,three_btn)
+    chose_amount_key.add(one_btn, two_btn,three_btn)
     chose_amount_key.add(four_btn, five_btn, six_btn)
     chose_amount_key.add(seven_btn, eight_btn, nine_btn)
     chose_amount_key.add(back_btn)
     return chose_amount_key
+
+
+keyboard_hide = types.ReplyKeyboardRemove()

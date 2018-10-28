@@ -96,13 +96,10 @@ def pizza_menu(message):
                 img = open('cache/picture_for_send_two.jpg', 'rb')
 
             product_ = product.get_pizza_product_by_title(message.text)
-            bot.send_photo(message.chat.id, img, messages.product(product_), parse_mode='HTML',
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
 
             img.close()
-            msg = open('msg.data', 'w')
-            msg.write(message.text)
-            msg.close
 
     if message.text == '⬅ Назад':
         bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
@@ -120,15 +117,37 @@ def pizza_menu(message):
 
 @bot.callback_query_handler(func=lambda call: True)
 def add_to_basket(call):
+    state = states.get_current_state(call.message.chat.id)
     if call.data == 'add_to_basket':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=keyboards.chose_amount())
         bot.answer_callback_query(call.id, 'Выберите колличество')
+        states.set_state(call.message.chat.id, States.S_CHOSE_AMOUNT.value)
     elif call.data == 'back':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=keyboards.add_to_basket())
         bot.answer_callback_query(call.id, '⬅ Назад')
+        states.set_state(call.message.chat.id, States.S_PIZZA_MENU.value)
     elif call.data == 'chose_amount':
         bot.answer_callback_query(call.id, 'Выберите колличество')
+    elif state == States.S_CHOSE_AMOUNT.value:
+        if call.data == '1':
+            bot.answer_callback_query(call.id, '1')
+        elif call.data == '2':
+            bot.answer_callback_query(call.id, '2')
+        elif call.data == '3':
+            bot.answer_callback_query(call.id, '3')
+        elif call.data == '4':
+            bot.answer_callback_query(call.id, '4')
+        elif call.data == '5':
+            bot.answer_callback_query(call.id, '5')
+        elif call.data == '6':
+            bot.answer_callback_query(call.id, '6')
+        elif call.data == '7':
+            bot.answer_callback_query(call.id, '7')
+        elif call.data == '8':
+            bot.answer_callback_query(call.id, '8')
+        elif call.data == '9':
+            bot.answer_callback_query(call.id, '9')
 
 bot.polling()
