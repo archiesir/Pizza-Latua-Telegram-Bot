@@ -4,6 +4,8 @@ from telebot import types
 
 import product
 
+keyboard_hide = types.ReplyKeyboardRemove()
+
 
 def main_menu():
     key_main_menu = types.ReplyKeyboardMarkup(True)
@@ -91,5 +93,3 @@ def chose_amount():
     chose_amount_key.add(back_btn)
     return chose_amount_key
 
-
-keyboard_hide = types.ReplyKeyboardRemove()

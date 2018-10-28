@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import os
-import requests
+
 import telebot
 import config
 import product
@@ -98,7 +97,6 @@ def pizza_menu(message):
             product_ = product.get_pizza_product_by_title(message.text)
             bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
-
             img.close()
 
     if message.text == '⬅ Назад':
@@ -149,5 +147,6 @@ def add_to_basket(call):
             bot.answer_callback_query(call.id, '8')
         elif call.data == '9':
             bot.answer_callback_query(call.id, '9')
+
 
 bot.polling()
