@@ -73,5 +73,10 @@ def get_pizza_product_by_title(title):
             }
             return product
             break
-
-    return {'title': False}
+    product = {
+        'title': False,
+        'comp': False,
+        'price': False,
+        'picture': False
+    }
+    return product

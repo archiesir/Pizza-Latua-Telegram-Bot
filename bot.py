@@ -85,18 +85,24 @@ def categories_menu(message):
 def pizza_menu(message):
     for p in product.get_pizza_titles():
         if message.text == p:
-            img_url = product.get_pizza_product_by_title(message.text)['picture']
-            print(img_url)
-            urllib2.urlretrieve(img_url, 'images/picture_for_send.jpg')
-            img = open('images/picture_for_send.jpg', 'rb')
-            product_ = product.get_pizza_product_by_title(message.text)
-            bot.send_photo(message.chat.id, img, messages.product(product_), parse_mode='HTML', reply_markup=keyboards.amount())
-            img.close()
+            bot.send_chat_action(message.chat.id, 'upload_photo')
 
+            img_url = product.get_pizza_product_by_title(message.text)['picture']
             try:
-                os.remove('images/picture_for_send.jpg')
-            except PermissionError:
-                break
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_pizza_product_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+
+            img.close()
+            msg = open('msg.data', 'w')
+            msg.write(message.text)
+            msg.close
 
     if message.text == '⬅ Назад':
         bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
@@ -111,5 +117,18 @@ def pizza_menu(message):
         bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
                                           'Или попробуйте /start или /help')
 
+
+@bot.callback_query_handler(func=lambda call: True)
+def add_to_basket(call):
+    if call.data == 'add_to_basket':
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
+                                      reply_markup=keyboards.chose_amount())
+        bot.answer_callback_query(call.id, 'Выберите колличество')
+    elif call.data == 'back':
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
+                                      reply_markup=keyboards.add_to_basket())
+        bot.answer_callback_query(call.id, '⬅ Назад')
+    elif call.data == 'chose_amount':
+        bot.answer_callback_query(call.id, 'Выберите колличество')
 
 bot.polling()
