@@ -70,6 +70,9 @@ def categories_menu(message):
     elif message.text == '🥘 Супы':
         bot.send_message(message.chat.id, 'Выберите блюдо 👇🏻', reply_markup=keyboards.soup())
         states.set_state(message.chat.id, States.S_SOUP_MENU.value)
+    elif message.text == '🍽 Прочие блюда':
+        bot.send_message(message.chat.id, 'Выберите блюдо 👇🏻', reply_markup=keyboards.others())
+        states.set_state(message.chat.id, States.S_OTHER_MENU.value)
     elif message.text == '🏠 Начало':
         bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
         states.set_state(message.chat.id, States.S_MAIN_MENU.value)
@@ -86,7 +89,7 @@ def pizza_menu(message):
         if message.text == p:
             bot.send_chat_action(message.chat.id, 'upload_photo')
 
-            img_url = product.get_pizza_product_by_title(message.text)['picture']
+            img_url = product.get_pizza_by_title(message.text)['picture']
             try:
                 urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
                 img = open('cache/picture_for_send.jpg', 'rb')
@@ -94,7 +97,7 @@ def pizza_menu(message):
                 urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
                 img = open('cache/picture_for_send_two.jpg', 'rb')
 
-            product_ = product.get_pizza_product_by_title(message.text)
+            product_ = product.get_pizza_by_title(message.text)
             bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -108,7 +111,205 @@ def pizza_menu(message):
         states.set_state(message.chat.id, States.S_MAIN_MENU.value)
     elif message.text == '📥 Корзина':
         pass
-    elif not product.get_pizza_product_by_title(message.text)['title']:
+    elif not product.get_pizza_by_title(message.text)['title']:
+        bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
+                                          'Или попробуйте /start или /help')
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_BURGER_MENU.value)
+def burger_menu(message):
+    for p in product.get_burger_titles():
+        if message.text == p:
+            bot.send_chat_action(message.chat.id, 'upload_photo')
+
+            img_url = product.get_burger_by_title(message.text)['picture']
+            try:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_burger_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+            img.close()
+
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(message.chat.id, States.S_MENU.value)
+    elif message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+    elif message.text == '📥 Корзина':
+        pass
+    elif not product.get_burger_by_title(message.text)['title']:
+        bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
+                                          'Или попробуйте /start или /help')
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_DRINKS_MENU.value)
+def drinks_menu(message):
+    for p in product.get_drinks_titles():
+        if message.text == p:
+            bot.send_chat_action(message.chat.id, 'upload_photo')
+
+            img_url = product.get_drinks_by_title(message.text)['picture']
+            try:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_drinks_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+            img.close()
+
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(message.chat.id, States.S_MENU.value)
+    elif message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+    elif message.text == '📥 Корзина':
+        pass
+    elif not product.get_drinks_by_title(message.text)['title']:
+        bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
+                                          'Или попробуйте /start или /help')
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_PASTA_MENU.value)
+def pasta_menu(message):
+    for p in product.get_pasta_titles():
+        if message.text == p:
+            bot.send_chat_action(message.chat.id, 'upload_photo')
+
+            img_url = product.get_pasta_by_title(message.text)['picture']
+            try:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_pasta_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+            img.close()
+
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(message.chat.id, States.S_MENU.value)
+    elif message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+    elif message.text == '📥 Корзина':
+        pass
+    elif not product.get_pasta_by_title(message.text)['title']:
+        bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
+                                          'Или попробуйте /start или /help')
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_SALAD_MENU.value)
+def salad_menu(message):
+    for p in product.get_salad_titles():
+        if message.text == p:
+            bot.send_chat_action(message.chat.id, 'upload_photo')
+
+            img_url = product.get_salad_by_title(message.text)['picture']
+            try:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_salad_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+            img.close()
+
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(message.chat.id, States.S_MENU.value)
+    elif message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+    elif message.text == '📥 Корзина':
+        pass
+    elif not product.get_salad_by_title(message.text)['title']:
+        bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
+                                          'Или попробуйте /start или /help')
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_SOUP_MENU.value)
+def soup_menu(message):
+    for p in product.get_soup_titles():
+        if message.text == p:
+            bot.send_chat_action(message.chat.id, 'upload_photo')
+
+            img_url = product.get_soup_by_title(message.text)['picture']
+            try:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_salad_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+            img.close()
+
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(message.chat.id, States.S_MENU.value)
+    elif message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+    elif message.text == '📥 Корзина':
+        pass
+    elif not product.get_soup_by_title(message.text)['title']:
+        bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
+                                          'Или попробуйте /start или /help')
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_OTHER_MENU.value)
+def others_menu(message):
+    for p in product.get_others_titles():
+        if message.text == p:
+            bot.send_chat_action(message.chat.id, 'upload_photo')
+
+            img_url = product.get_others_by_title(message.text)['picture']
+            try:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
+                img = open('cache/picture_for_send.jpg', 'rb')
+            except:
+                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
+                img = open('cache/picture_for_send_two.jpg', 'rb')
+
+            product_ = product.get_others_by_title(message.text)
+            bot.send_photo(message.chat.id, img, messages.product_info(product_), parse_mode='HTML',
+                           reply_markup=keyboards.add_to_basket())
+            img.close()
+
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(message.chat.id, States.S_MENU.value)
+    elif message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+    elif message.text == '📥 Корзина':
+        pass
+    elif not product.get_others_by_title(message.text)['title']:
         bot.send_message(message.chat.id, 'Неизвесное название продукта попробуйте другое!\n'
                                           'Или попробуйте /start или /help')
 
@@ -125,28 +326,30 @@ def add_to_basket(call):
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=keyboards.add_to_basket())
         bot.answer_callback_query(call.id, '⬅ Назад')
-        states.set_state(call.message.chat.id, States.S_PIZZA_MENU.value)
+        bot.send_message(call.message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        states.set_state(call.message.chat.id, States.S_MENU.value)
     elif call.data == 'chose_amount':
         bot.answer_callback_query(call.id, 'Выберите колличество')
     elif state == States.S_CHOSE_AMOUNT.value:
         if call.data == '1':
-            bot.answer_callback_query(call.id, '1')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '2':
-            bot.answer_callback_query(call.id, '2')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '3':
-            bot.answer_callback_query(call.id, '3')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '4':
-            bot.answer_callback_query(call.id, '4')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '5':
-            bot.answer_callback_query(call.id, '5')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '6':
-            bot.answer_callback_query(call.id, '6')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '7':
-            bot.answer_callback_query(call.id, '7')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '8':
-            bot.answer_callback_query(call.id, '8')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
         elif call.data == '9':
-            bot.answer_callback_query(call.id, '9')
+            bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
 
 
 bot.polling()
