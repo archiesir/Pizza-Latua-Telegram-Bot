@@ -76,3 +76,74 @@ def add_phone_number(chat_id, phone_number):
 
     connection.commit()
     connection.close()
+
+
+def add_order(chat_id, title, comp, price, picture):
+    connection = pymysql.connect(host=config.db_host,
+                                 user=config.db_user,
+                                 password=config.db_password,
+                                 db=config.db_name)
+    cursor = connection.cursor()
+    delete_empty_orders()
+    sql = "INSERT INTO orders(chat_id, title, comp, price, picture) VALUES(\'{}\', \'{}\', \'{}\', \'{}\', \'{}\')".format(
+        chat_id, title, comp, price, picture)
+    cursor.execute(sql)
+
+    connection.commit()
+    connection.close()
+
+
+def edit_order_amount(id, amount):
+    connection = pymysql.connect(host=config.db_host,
+                                 user=config.db_user,
+                                 password=config.db_password,
+                                 db=config.db_name)
+    cursor = connection.cursor()
+    sql = "UPDATE orders SET amount = \'{}\' WHERE id = \'{}\'".format(amount, id)
+    cursor.execute(sql)
+
+    connection.commit()
+    connection.close()
+
+
+def get_orders_by_chat_id(chat_id):
+    connection = pymysql.connect(host=config.db_host,
+                                 user=config.db_user,
+                                 password=config.db_password,
+                                 db=config.db_name,
+                                 charset='utf8')
+    cursor = connection.cursor()
+    sql = "SELECT * FROM orders WHERE chat_id = \'{}\'".format(chat_id)
+    cursor.execute(sql)
+    output = cursor.fetchall()
+
+    connection.commit()
+    connection.close()
+    return output
+
+
+def clear_basket(chat_id):
+    connection = pymysql.connect(host=config.db_host,
+                                 user=config.db_user,
+                                 password=config.db_password,
+                                 db=config.db_name,
+                                 charset='utf8')
+    cursor = connection.cursor()
+    sql = "DELETE FROM orders WHERE chat_id = \'{}\'".format(chat_id)
+    cursor.execute(sql)
+    connection.commit()
+    connection.close()
+
+
+def delete_empty_orders():
+    connection = pymysql.connect(host=config.db_host,
+                                 user=config.db_user,
+                                 password=config.db_password,
+                                 db=config.db_name,
+                                 charset='utf8')
+    cursor = connection.cursor()
+    sql = "DELETE FROM orders WHERE amount = \'{}\'".format(0)
+    cursor.execute(sql)
+    connection.commit()
+    connection.close()
+

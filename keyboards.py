@@ -26,7 +26,7 @@ def categories():
 
 
 def pizza():
-    key_pizza = types.ReplyKeyboardMarkup(True, True)
+    key_pizza = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -39,7 +39,7 @@ def pizza():
 
 
 def burger():
-    key_burger = types.ReplyKeyboardMarkup(True, True)
+    key_burger = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -52,7 +52,7 @@ def burger():
 
 
 def drinks():
-    key_drinks = types.ReplyKeyboardMarkup(True, True)
+    key_drinks = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -65,7 +65,7 @@ def drinks():
 
 
 def pasta():
-    key_pasta = types.ReplyKeyboardMarkup(True, True)
+    key_pasta = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -78,7 +78,7 @@ def pasta():
 
 
 def salad():
-    key_salad = types.ReplyKeyboardMarkup(True, True)
+    key_salad = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -91,7 +91,7 @@ def salad():
 
 
 def soup():
-    key_soup = types.ReplyKeyboardMarkup(True, True)
+    key_soup = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -104,7 +104,7 @@ def soup():
 
 
 def others():
-    key_other = types.ReplyKeyboardMarkup(True, True)
+    key_other = types.ReplyKeyboardMarkup(True)
     back_btn = types.KeyboardButton('⬅ Назад')
     main_menu_btn = types.KeyboardButton('🏠 Начало')
     basket_btn = types.KeyboardButton('📥 Корзина')
@@ -119,7 +119,9 @@ def others():
 def add_to_basket():
     key_basket = types.InlineKeyboardMarkup()
     basket_btn = types.InlineKeyboardButton(text='📥 Добавить в корзину', callback_data='add_to_basket')
+    back_btn = types.InlineKeyboardButton(text='⬅ Назад', callback_data='back_to_menu')
     key_basket.add(basket_btn)
+    key_basket.add(back_btn)
     return key_basket
 
 
@@ -143,3 +145,36 @@ def chose_amount():
     chose_amount_key.add(back_btn)
     return chose_amount_key
 
+
+def basket():
+    basket_key = types.InlineKeyboardMarkup()
+    clear_btn = types.InlineKeyboardButton(text='❌ Очистить корзину', callback_data='clear_basket')
+    reg_btn = types.InlineKeyboardButton(text='✅ Оформить заказ?', callback_data='reg_order')
+    basket_key.add(clear_btn)
+    basket_key.add(reg_btn)
+    return basket_key
+
+
+def check_delivery():
+    key_delivery = types.ReplyKeyboardMarkup(True)
+    deliver_btn = types.KeyboardButton('🚖 Доставка')
+    self_btn = types.KeyboardButton('🏃 Самовывоз')
+    key_delivery.add(deliver_btn, self_btn)
+    key_delivery.row('🏠 Начало')
+    return key_delivery
+
+
+def check_geo():
+    key_geo = types.ReplyKeyboardMarkup(True)
+    geo_btn = types.KeyboardButton('📌 отправить геолокацию', request_location=True)
+    key_geo.add(geo_btn)
+    key_geo.row('⬅ Назад', '🏠 Начало')
+    return key_geo
+
+
+def check_number():
+    key_number = types.ReplyKeyboardMarkup(True)
+    num_btn = types.KeyboardButton('📱 отправить номер телефона', request_contact=True)
+    key_number.add(num_btn)
+    key_number.row('⬅ Назад', '🏠 Начало')
+    return key_number

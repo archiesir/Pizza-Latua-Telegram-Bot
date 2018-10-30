@@ -2,14 +2,35 @@
 
 from enum import Enum
 
+import db
 
-def product_info(product):
+
+def product_data(product):
     title = product['title']
-    comp = product['comp']
     price = product['price']
-    return '<b>{}</b>\n\n' \
-           '{}\n\n' \
-           '<b>Цена: {} руб.</b>'.format(title, comp, price)
+
+    if not product['comp']:
+        output = '<b>{}</b>\n\n' \
+                 '<b>Цена: {} руб.</b>'.format(title, price)
+    else:
+        comp = product['comp']
+        output = '<b>{}</b>\n\n' \
+                 '{}\n\n' \
+                 '<b>Цена: {} руб.</b>'.format(title, comp, price)
+    return output
+
+
+def basket(chat_id):
+    db.delete_empty_orders()
+    orders = db.get_orders_by_chat_id(chat_id)
+    sum = 0
+    output = '<b>📥 Корзина:</b>\n\n'
+    for o in orders:
+        output = output + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5]*o[2]) + ' руб.' + '\n'
+    for o in orders:
+        sum = sum + o[5]*o[2]
+    output = output + '\n<b>Общая сумма: ' + str(sum) + ' руб.</b>'
+    return output
 
 
 class Messages(Enum):

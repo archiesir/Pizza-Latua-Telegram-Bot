@@ -16,6 +16,7 @@ def get_html(url):
     r = requests.get(url)
     return r.text
 
+
 # PARSE PRODUCTS:
 # PIZZA
 def get_pizza_titles():
