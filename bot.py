@@ -95,11 +95,11 @@ def pizza_menu(message):
 
             img_url = product.get_pizza_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/pizza.jpg')
+                img = open('cache/pizza.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/pizza_two.jpg')
+                img = open('cache/pizza_two.jpg', 'rb')
 
             product_ = product.get_pizza_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -138,11 +138,11 @@ def burger_menu(message):
 
             img_url = product.get_burger_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/burger.jpg')
+                img = open('cache/burger.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/burger_two.jpg')
+                img = open('cache/burger_two.jpg', 'rb')
 
             product_ = product.get_burger_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -181,11 +181,11 @@ def drinks_menu(message):
 
             img_url = product.get_drinks_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/drinks.jpg')
+                img = open('cache/drinks.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/drinks_two.jpg')
+                img = open('cache/drinks_two.jpg', 'rb')
 
             product_ = product.get_drinks_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -224,11 +224,11 @@ def pasta_menu(message):
 
             img_url = product.get_pasta_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/pasta.jpg')
+                img = open('cache/pasta.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/pasta_two.jpg')
+                img = open('cache/pasta_two.jpg', 'rb')
 
             product_ = product.get_pasta_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -267,11 +267,11 @@ def salad_menu(message):
 
             img_url = product.get_salad_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/salad.jpg')
+                img = open('cache/salad.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/salad_two.jpg')
+                img = open('cache/salad_two.jpg', 'rb')
 
             product_ = product.get_salad_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -310,11 +310,11 @@ def soup_menu(message):
 
             img_url = product.get_soup_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/soup.jpg')
+                img = open('cache/soup.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/soup_two.jpg')
+                img = open('cache/soup_two.jpg', 'rb')
 
             product_ = product.get_soup_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -353,11 +353,11 @@ def others_menu(message):
 
             img_url = product.get_others_by_title(message.text)['picture']
             try:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send.jpg')
-                img = open('cache/picture_for_send.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/other.jpg')
+                img = open('cache/other.jpg', 'rb')
             except:
-                urllib2.urlretrieve(img_url, 'cache/picture_for_send_two.jpg')
-                img = open('cache/picture_for_send_two.jpg', 'rb')
+                urllib2.urlretrieve(img_url, 'cache/other_two.jpg')
+                img = open('cache/other_two.jpg', 'rb')
 
             product_ = product.get_others_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
@@ -481,7 +481,7 @@ def add_to_basket(call):
     elif call.data == 'clear_basket':
         db.clear_basket(call.message.chat.id)
         bot.answer_callback_query(call.id, '✅ Корзина очищена')
-        bot.send_message(call.message.chat.id, 'Корзина очищена. Выберите раздел, чтобы вывести список блюд 👇🏻',
+        bot.send_message(call.message.chat.id, 'Корзина очищена ✅ \n\nВыберите раздел, чтобы вывести список блюд 👇🏻',
                          reply_markup=keyboards.categories())
         states.set_state(call.message.chat.id, States.S_MENU.value)
     elif call.data == 'reg_order':
