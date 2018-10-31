@@ -389,7 +389,7 @@ def get_soup_by_title(title):
             except:
                 comp = False
             try:
-                price = food.find('div', class_='row').find('span').text
+                price = food.find('form', 'food-form').find('div', class_='row').find('span').text
             except:
                 price = False
             try:

@@ -21,15 +21,17 @@ def product_data(product):
 
 
 def basket(chat_id):
-    db.delete_empty_orders()
+    db.delete_empty_orders(chat_id)
     orders = db.get_orders_by_chat_id(chat_id)
     sum = 0
     output = '<b>📥 Корзина:</b>\n\n'
     for o in orders:
-        output = output + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5]*o[2]) + ' руб.' + '\n'
+        output = output + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5]*o[2]) + ' руб.' + '\n\n'
     for o in orders:
         sum = sum + o[5]*o[2]
-    output = output + '\n<b>Общая сумма: ' + str(sum) + ' руб.</b>'
+    output = output + '<b>Общая сумма: ' + str(sum) + ' руб.</b>'
+    if sum == 0:
+        output = 'Минимальная сумма заказа должна быть больше чем 0 руб.'
     return output
 
 

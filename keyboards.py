@@ -166,15 +166,48 @@ def check_delivery():
 
 def check_geo():
     key_geo = types.ReplyKeyboardMarkup(True)
-    geo_btn = types.KeyboardButton('📌 отправить геолокацию', request_location=True)
+    geo_btn = types.KeyboardButton(text='📌 отправить геолокацию', request_location=True)
     key_geo.add(geo_btn)
     key_geo.row('⬅ Назад', '🏠 Начало')
     return key_geo
 
 
-def check_number():
+def check_phone_number():
     key_number = types.ReplyKeyboardMarkup(True)
-    num_btn = types.KeyboardButton('📱 отправить номер телефона', request_contact=True)
+    num_btn = types.KeyboardButton(text='📱 отправить номер', request_contact=True)
     key_number.add(num_btn)
     key_number.row('⬅ Назад', '🏠 Начало')
     return key_number
+
+
+def check_time():
+    key_number = types.ReplyKeyboardMarkup(True)
+    num_btn = types.KeyboardButton(text='В ближайшее время')
+    key_number.add(num_btn)
+    key_number.row('⬅ Назад', '🏠 Начало')
+    return key_number
+
+
+def comments_key():
+    key_number = types.ReplyKeyboardMarkup(True)
+    num_btn = types.KeyboardButton(text='➡ Продолжить')
+    key_number.add(num_btn)
+    key_number.row('⬅ Назад', '🏠 Начало')
+    return key_number
+
+
+def payments_key():
+    key_number = types.ReplyKeyboardMarkup(True)
+    first_btn = types.KeyboardButton(text='💵 Наличные')
+    second_btn = types.KeyboardButton(text='💳 Безнал (Yandex Money)')
+    key_number.add(first_btn)
+    key_number.add(second_btn)
+    key_number.row('⬅ Назад', '🏠 Начало')
+    return key_number
+
+
+def back_keyboard():
+    back_key = types.ReplyKeyboardMarkup(True)
+    back_btn = types.KeyboardButton(text='⬅ Назад')
+    back_key.add(back_btn)
+    return back_key
