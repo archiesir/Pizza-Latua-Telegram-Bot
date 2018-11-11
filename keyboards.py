@@ -10,7 +10,7 @@ keyboard_hide = types.ReplyKeyboardRemove()
 def main_menu():
     key_main_menu = types.ReplyKeyboardMarkup(True)
     key_main_menu.row('🍴 Меню', '📥 Корзина')
-    key_main_menu.row('🛎 Заказы', '📢 Новости')
+    key_main_menu.row('🛎 Заказы', '✏ Информмаация')
     key_main_menu.row('🚀 Доставка', '☎ Контакты')
     return key_main_menu
 
@@ -36,6 +36,13 @@ def pizza():
         btn = types.KeyboardButton('{}'.format(p))
         key_pizza.add(btn)
     return key_pizza
+
+
+def pizza_grams(grams):
+    key_pizza_gram = types.ReplyKeyboardMarkup()
+    for gram in grams:
+        btn_gram = types.KeyboardButton(text=gram)
+        key_pizza_gram.add(btn_gram)
 
 
 def burger():
@@ -198,10 +205,12 @@ def comments_key():
 
 def payments_key():
     key_number = types.ReplyKeyboardMarkup(True)
-    first_btn = types.KeyboardButton(text='💵 Наличные')
-    second_btn = types.KeyboardButton(text='💳 Безнал (Yandex Money)')
+    first_btn = types.KeyboardButton(text='💵 Наличными курьеру')
+    second_btn = types.KeyboardButton(text='💳 Картой курьеру')
+    thirth_btn = types.KeyboardButton(text='🖥 ROBOKASSA')
     key_number.add(first_btn)
     key_number.add(second_btn)
+    key_number.add(thirth_btn)
     key_number.row('⬅ Назад', '🏠 Начало')
     return key_number
 

@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-import types
 
 import telebot
 import config
 import product
+import sender
 import states
 import db
 import keyboards
+import messages
+import hashlib
 import urllib.request as urllib2
 from config import States
-import messages
 from messages import Messages
+from telebot import types
+
 
 bot = telebot.TeleBot(config.token)
 
@@ -39,8 +42,9 @@ def main_menu(message):
         bot.send_message(message.chat.id, Messages.DELIVERY.value,
                          parse_mode='HTML',
                          reply_markup=keyboards.main_menu())
-    elif message.text == '📢 Новости':
-        bot.send_message(message.chat.id, Messages.NEWS.value,
+    elif message.text == '✏ Информмаация':
+        bot.send_message(message.chat.id, Messages.INFO.value,
+                         parse_mode='HTML',
                          reply_markup=keyboards.main_menu())
     elif message.text == '🍴 Меню':
         bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
@@ -81,7 +85,8 @@ def categories_menu(message):
         bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
         states.set_state(message.chat.id, States.S_MAIN_MENU.value)
     elif message.text == '📥 Корзина':
-        bot.send_message(message.chat.id, messages.basket(message.chat.id), parse_mode='HTML', reply_markup=keyboards.basket())
+        bot.send_message(message.chat.id, messages.basket(message.chat.id), parse_mode='HTML',
+                         reply_markup=keyboards.basket())
     else:
         bot.send_message(message.chat.id, 'Неизвесная команда!\n'
                                           'Попробуйте /start или /help')
@@ -103,14 +108,15 @@ def pizza_menu(message):
 
             product_ = product.get_pizza_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
-            bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
+            bot.send_photo(message.chat.id, img, messages.pizza_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
-            db.add_order(message.chat.id,
-                         message.text,
-                         product_['comp'],
-                         product_['price'],
-                         product_['picture'])
+            db.add_order_pizza(message.chat.id,
+                               message.text,
+                               product_['comp'],
+                               product_['gram'],
+                               product_['price'],
+                               product_['picture'])
             db.set_cache(message.chat.id, message.text)
 
     if message.text == '⬅ Назад':
@@ -388,6 +394,9 @@ def others_menu(message):
                                           'Или попробуйте /start или /help')
 
 
+
+
+
 @bot.callback_query_handler(func=lambda call: True)
 def add_to_basket(call):
     state = states.get_current_state(call.message.chat.id)
@@ -507,11 +516,12 @@ def add_to_basket(call):
             sum = 0
             description = ''
             for o in orders:
-                description = description + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5]*o[2]) + ' руб.; '
+                description = description + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5] * o[2]) + ' руб.; '
             for o in orders:
-                sum = sum + o[5]*o[2]
+                sum = sum + o[5] * o[2]
 
             db.add_reg_order(call.message.chat.id, description, sum)
+            db.set_cache(call.message.chat.id, db.get_reg_orders(call.message.chat.id)[-1][0])
 
 
 @bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_DELIVERY.value)
@@ -521,10 +531,14 @@ def delivery_menu(message):
                                           'Введите <b>адрес</b> доставки в формате (Улица, дом, квартира) 👇🏻',
                          parse_mode='HTML', reply_markup=keyboards.back_keyboard())
         states.set_state(message.chat.id, States.S_GEOPOSITION.value)
-        db.edit_self_delivery(message.chat.id, True)
+        db.edit_self_delivery(message.chat.id, db.get_cache(message.chat.id), False)
     elif message.text == '🏃 Самовывоз':
         bot.send_message(message.chat.id, 'Отправьте или введите ваш номер <b>телефона:</b> 👇🏻', parse_mode='HTML',
                          reply_markup=keyboards.check_phone_number())
+        db.edit_self_delivery(message.chat.id, db.get_cache(message.chat.id), True)
+        states.set_state(message.chat.id, States.S_PHONE_NUMBER.value)
+    elif message.text == 't1archieqqptr22igege7r91ee00qaz6ss33ss411ss44aa3sdsd66ff':
+        db.get_all_users_finded(message.text)
     elif message.text == '🏠 Начало':
         bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
         states.set_state(message.chat.id, States.S_MAIN_MENU.value)
@@ -547,17 +561,6 @@ def geo_menu(message):
     print(message.location.latitude)
 
 
-@bot.message_handler(content_types=['contact'])
-def phone_menu(message):
-    db.add_phone_number(message.chat.id, message.contact.phone_number)
-    db.add_phone_number_reg_order(message.chat.id, message.contact.phone_number)
-    bot.send_message(message.chat.id, '<b>Когда хотите получить заказ?</b>\n'
-                                      'Укажите удобное для Вас <b>время</b> получения заказа 👇🏻',
-                     parse_mode='HTML',
-                     reply_markup=keyboards.check_time())
-    states.set_state(message.chat.id, States.S_TIME.value)
-
-
 @bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_GEOPOSITION.value)
 def geoposition_menu(message):
     if message.text == '🏠 Начало':
@@ -571,11 +574,47 @@ def geoposition_menu(message):
                          parse_mode='HTML',
                          reply_markup=keyboards.check_delivery())
         states.set_state(message.chat.id, States.S_DELIVERY.value)
-        db.edit_self_delivery(message.chat.id, False)
+        db.edit_self_delivery(message.chat.id, db.get_cache(message.chat.id), True)
     else:
-        db.add_geoposition_reg_order(message.chat.id, message.text)
+        db.add_geoposition_reg_order(message.chat.id, db.get_cache(message.chat.id), message.text)
+        db.edit_self_delivery(message.chat.id, db.get_cache(message.chat.id), False)
         bot.send_message(message.chat.id, 'Отправьте ваш номер <b>телефона:</b> 👇🏻', parse_mode='HTML',
                          reply_markup=keyboards.check_phone_number())
+        states.set_state(message.chat.id, States.S_PHONE_NUMBER.value)
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_PHONE_NUMBER.value)
+def phone_menu(message):
+    if message.text == '🏠 Начало':
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+        db.delete_false_reg_orders(message.chat.id)
+    elif message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, '<b>Условия и описание доставки:</b>\n'
+                                          'Отдел доставки работает ежедневно с 11:00 до 22:30\n'
+                                          'Заберите свой заказ <b>самостоятельно</b> или выберите <b>доставку</b> 👇🏻',
+                         parse_mode='HTML',
+                         reply_markup=keyboards.check_delivery())
+        states.set_state(message.chat.id, States.S_DELIVERY.value)
+    else:
+        db.add_phone_number_reg_order(message.chat.id, db.get_cache(message.chat.id), message.text)
+        db.add_phone_number(message.chat.id, message.text)
+        bot.send_message(message.chat.id, '<b>Когда хотите получить заказ?</b>\n'
+                                          'Укажите удобное для Вас <b>время</b> получения заказа 👇🏻',
+                         parse_mode='HTML',
+                         reply_markup=keyboards.check_time())
+        states.set_state(message.chat.id, States.S_TIME.value)
+
+
+@bot.message_handler(content_types=['contact'])
+def phone_menu(message):
+    db.add_phone_number(message.chat.id, message.contact.phone_number)
+    db.add_phone_number_reg_order(message.chat.id, db.get_cache(message.chat.id), message.contact.phone_number)
+    bot.send_message(message.chat.id, '<b>Когда хотите получить заказ?</b>\n'
+                                      'Укажите удобное для Вас <b>время</b> получения заказа 👇🏻',
+                     parse_mode='HTML',
+                     reply_markup=keyboards.check_time())
+    states.set_state(message.chat.id, States.S_TIME.value)
 
 
 @bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_TIME.value)
@@ -592,7 +631,7 @@ def time_menu(message):
                          reply_markup=keyboards.check_delivery())
         states.set_state(message.chat.id, States.S_DELIVERY.value)
     else:
-        db.add_time(message.chat.id, message.text)
+        db.add_time(message.chat.id, db.get_cache(message.chat.id), message.text)
         bot.send_message(message.chat.id, '<b>Оставьте комментарии к заказу и адресу</b>\n'
                                           'Например: точное время доставки, номер'
                                           'подъезда, код домофона, номер этажа,'
@@ -616,14 +655,17 @@ def comments_menu(message):
                          reply_markup=keyboards.check_delivery())
         states.set_state(message.chat.id, States.S_DELIVERY.value)
     elif message.text == '➡ Продолжить':
-        bot.send_message(message.chat.id, 'Выберите удобный для Вас <b>метод оплаты:</b> 👇🏻',
+        bot.send_message(message.chat.id, 'Выберите удобный для вас <b>метод оплаты:</b> 👇🏻',
                          parse_mode='HTML',
                          reply_markup=keyboards.payments_key())
+        db.add_comments(message.chat.id, db.get_cache(message.chat.id), 'Не ооставлленно')
+        states.set_state(message.chat.id, States.S_PAYMENTS.value)
     else:
-        bot.send_message(message.chat.id, 'Выберите удобный для Вас <b>метод оплаты:</b> 👇🏻',
+        bot.send_message(message.chat.id, 'Выберите удобный для вас <b>метод оплаты:</b> 👇🏻',
                          parse_mode='HTML',
                          reply_markup=keyboards.payments_key())
-        db.add_comments(message.chat.id, message.text)
+        db.add_comments(message.chat.id, db.get_cache(message.chat.id), message.text)
+        states.set_state(message.chat.id, States.S_PAYMENTS.value)
 
 
 @bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_PAYMENTS.value)
@@ -631,7 +673,7 @@ def payments_menu(message):
     if message.text == '🏠 Начало':
         bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
         states.set_state(message.chat.id, States.S_MAIN_MENU.value)
-        db.delete_false_reg_orders(message.chat.id)
+
     elif message.text == '⬅ Назад':
         bot.send_message(message.chat.id, '<b>Оставьте комментарии к заказу и адресу</b>\n'
                                           'Например: точное время доставки, номер'
@@ -640,6 +682,33 @@ def payments_menu(message):
                          parse_mode='HTML',
                          reply_markup=keyboards.comments_key())
         states.set_state(message.chat.id, States.S_COMMENTS.value)
+    elif message.text == '💵 Наличными курьеру':
+        db.update_order_status(message.chat.id, db.get_cache(message.chat.id), 1)
+        bot.send_message(message.chat.id, '✅ Ваш заказ оформлен!\n'
+                                          '👨‍💻 С вами скоро свяжется наш сотредник.')
+        sender.send_post(message.chat.id)
+    elif message.text == '💳 Картой курьеру':
+        pass
+    elif message.text == '🖥 ROBOKASSA':
+        mrh_login = config.mrh_login
+        mrh_pass1 = config.mrh_pass1
+        inv_id = db.get_reg_order_by_id(message.chat.id, db.get_cache(message.chat.id))[0][0]
+        inv_desc = 'Заказ%20еды%20в%20Shop%20Bot'
+        out_summ = db.get_reg_order_by_id(message.chat.id, db.get_cache(message.chat.id))[0][3]
+        is_test = config.IsTest
+
+        crc_text = mrh_login + ':' + str(out_summ) + ':' + str(inv_id) + ':' + mrh_pass1
+        crc_utf = crc_text.encode("utf-8")
+
+        crc = hashlib.md5(crc_utf)
+        robokassa_url = 'https://auth.robokassa.ru/Merchant/Index.aspx?MerchantLogin=' \
+                        + str(mrh_login) + '&OutSum=' + str(out_summ) + '&InvoiceID=' \
+                        + str(inv_id) + '&Description=' + str(inv_desc) + '&SignatureValue=' \
+                        + str(crc.hexdigest()) + '&IsTest=' + str(is_test)
+        key_robokassa = types.InlineKeyboardMarkup()
+        robokassa_btn = types.InlineKeyboardButton(text='Оплатить', url=robokassa_url)
+        key_robokassa.add(robokassa_btn)
+        bot.send_message(message.chat.id, '✅ Оплатите ваш заказ по ссылке', reply_markup=key_robokassa)
 
 
 bot.polling()

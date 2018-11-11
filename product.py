@@ -59,9 +59,12 @@ def get_pizza_by_title(title):
             except:
                 comp = False
             try:
-                price = food.find('div', class_='row').find('span').text
+                rows = food.find('div', class_='row').find_all('span')
+                price = rows[0].text
+                gram = rows[1].text
             except:
                 price = False
+                gram = False
             try:
                 picture = pizza_url + food.find('a').find('img').get('src')
             except:
@@ -70,6 +73,7 @@ def get_pizza_by_title(title):
             product = {
                 'title': title,
                 'comp': comp,
+                'gram': gram,
                 'price': price,
                 'picture': picture
             }
