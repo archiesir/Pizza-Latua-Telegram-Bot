@@ -88,6 +88,33 @@ def get_pizza_by_title(title):
     return product
 
 
+def get_pizza_weight_by_title(title):
+    find_title = title
+    weights = []
+    html = requests.get(pizza_url).text
+
+    soup = BeautifulSoup(html, 'lxml')
+    food_col = soup.find('div', id="menu-good-1").find_all('div', class_='food-col')
+
+    for food in food_col:
+        try:
+            title = food.find('span', class_='food-title').text
+        except:
+            title = False
+
+        if find_title == title:
+            options = food.find('div', class_='item-list-weight-options').find('select', class_='shk_param').find_all('option')
+            for o in options:
+                text = o.text
+                price = o.get('value')[4:]
+                weights.append({
+                    'text': text,
+                    'price': price
+                })
+            return weights
+    return weights.clear()
+
+
 # BURGER
 def get_burger_titles():
     titles = []

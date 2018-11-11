@@ -109,7 +109,7 @@ def pizza_menu(message):
             product_ = product.get_pizza_by_title(message.text)
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
             bot.send_photo(message.chat.id, img, messages.pizza_data(product_), parse_mode='HTML',
-                           reply_markup=keyboards.add_to_basket())
+                           reply_markup=keyboards.add_to_basket_pizza())
             img.close()
             db.add_order_pizza(message.chat.id,
                                message.text,
@@ -394,7 +394,17 @@ def others_menu(message):
                                           'Или попробуйте /start или /help')
 
 
-
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_CHOSE_PIZZA_WEIGHT.value)
+def chose_weight_menu(message):
+    weights = product.get_pizza_weight_by_title(db.get_cache(message.chat.id))
+    # for we in weights:
+    #     print(weights)
+    for w in weights:
+        print(w['text'] + ' price: ' + w['price'])
+        if message.text in w['text']:
+            print('YES '+w['text'])
+            bot.send_message(message.chat.id, str(w['price']))
+            break
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -406,11 +416,22 @@ def add_to_basket(call):
         bot.answer_callback_query(call.id, 'Выберите колличество')
         states.set_state(call.message.chat.id, States.S_CHOSE_AMOUNT.value)
 
+    elif call.data == 'add_to_basket_pizza':
+        bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
+                                      reply_markup=keyboards.chose_pizza_weight())
+        bot.answer_callback_query(call.id, 'Выберите вес ⬇')
+        weights = []
+        for w in product.get_pizza_weight_by_title(db.get_cache(call.message.chat.id)):
+            weights.append(w['text'])
+        bot.send_message(call.message.chat.id, 'Выберите вес ⬇', reply_markup=keyboards.pizza_weights(weights))
+        states.set_state(call.message.chat.id, States.S_CHOSE_PIZZA_WEIGHT.value)
+
     elif call.data == 'back_to_menu':
         bot.answer_callback_query(call.id, '⬅ Назад')
         bot.send_message(call.message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
                          reply_markup=keyboards.categories())
         states.set_state(call.message.chat.id, States.S_MENU.value)
+
     elif call.data == 'back':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=keyboards.add_to_basket())
@@ -431,6 +452,7 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
         elif call.data == '2':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 2
             db.edit_order_amount(call.message.chat.id, title, sum)
@@ -438,6 +460,7 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
         elif call.data == '3':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 3
             db.edit_order_amount(call.message.chat.id, title, sum)
@@ -445,6 +468,7 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
         elif call.data == '4':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 4
             db.edit_order_amount(call.message.chat.id, title, sum)
@@ -452,6 +476,7 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
         elif call.data == '5':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 5
             db.edit_order_amount(call.message.chat.id, title, sum)
@@ -459,6 +484,7 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
         elif call.data == '6':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 6
             db.edit_order_amount(call.message.chat.id, title, sum)
@@ -473,6 +499,7 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
         elif call.data == '8':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 8
             db.edit_order_amount(call.message.chat.id, title, sum)
@@ -487,12 +514,14 @@ def add_to_basket(call):
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
             states.set_state(call.message.chat.id, States.S_MENU.value)
+
     elif call.data == 'clear_basket':
         db.clear_basket(call.message.chat.id)
         bot.answer_callback_query(call.id, '✅ Корзина очищена')
         bot.send_message(call.message.chat.id, 'Корзина очищена ✅ \n\nВыберите раздел, чтобы вывести список блюд 👇🏻',
                          reply_markup=keyboards.categories())
         states.set_state(call.message.chat.id, States.S_MENU.value)
+
     elif call.data == 'reg_order':
         try:
             orders = db.get_orders_by_chat_id(call.message.chat.id)

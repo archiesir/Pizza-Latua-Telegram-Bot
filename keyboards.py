@@ -38,11 +38,28 @@ def pizza():
     return key_pizza
 
 
-def pizza_grams(grams):
-    key_pizza_gram = types.ReplyKeyboardMarkup()
+def add_to_basket_pizza():
+    key_basket = types.InlineKeyboardMarkup()
+    basket_btn = types.InlineKeyboardButton(text='📥 Добавить пиццу в корзину', callback_data='add_to_basket_pizza')
+    back_btn = types.InlineKeyboardButton(text='⬅ Назад', callback_data='back_to_menu')
+    key_basket.add(basket_btn)
+    key_basket.add(back_btn)
+    return key_basket
+
+
+def chose_pizza_weight():
+    key_pizza_weight = types.InlineKeyboardMarkup()
+    btn_weight = types.InlineKeyboardButton('Выберите вес', callback_data='chose_weight')
+    key_pizza_weight.add(btn_weight)
+    return key_pizza_weight
+
+
+def pizza_weights(grams):
+    key_pizza_gram = types.ReplyKeyboardMarkup(True)
     for gram in grams:
         btn_gram = types.KeyboardButton(text=gram)
         key_pizza_gram.add(btn_gram)
+    return key_pizza_gram
 
 
 def burger():
