@@ -10,7 +10,7 @@ keyboard_hide = types.ReplyKeyboardRemove()
 def main_menu():
     key_main_menu = types.ReplyKeyboardMarkup(True)
     key_main_menu.row('🍴 Меню', '📥 Корзина')
-    key_main_menu.row('🛎 Заказы', '✏ Информмаация')
+    key_main_menu.row('🛎 Заказы', '✏ Информация')
     key_main_menu.row('🚀 Доставка', '☎ Контакты')
     return key_main_menu
 
@@ -55,10 +55,11 @@ def chose_pizza_weight():
 
 
 def pizza_weights(grams):
-    key_pizza_gram = types.ReplyKeyboardMarkup(True)
+    key_pizza_gram = types.ReplyKeyboardMarkup(True, True)
     for gram in grams:
-        btn_gram = types.KeyboardButton(text=gram)
+        btn_gram = types.KeyboardButton(text=gram['text'])
         key_pizza_gram.add(btn_gram)
+    key_pizza_gram.add('⬅ Назад')
     return key_pizza_gram
 
 

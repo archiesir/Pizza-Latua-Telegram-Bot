@@ -42,7 +42,7 @@ def main_menu(message):
         bot.send_message(message.chat.id, Messages.DELIVERY.value,
                          parse_mode='HTML',
                          reply_markup=keyboards.main_menu())
-    elif message.text == '✏ Информмаация':
+    elif message.text == '✏ Информация':
         bot.send_message(message.chat.id, Messages.INFO.value,
                          parse_mode='HTML',
                          reply_markup=keyboards.main_menu())
@@ -107,16 +107,12 @@ def pizza_menu(message):
                 img = open('cache/pizza_two.jpg', 'rb')
 
             product_ = product.get_pizza_by_title(message.text)
+
             bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
             bot.send_photo(message.chat.id, img, messages.pizza_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket_pizza())
             img.close()
-            db.add_order_pizza(message.chat.id,
-                               message.text,
-                               product_['comp'],
-                               product_['gram'],
-                               product_['price'],
-                               product_['picture'])
+
             db.set_cache(message.chat.id, message.text)
 
     if message.text == '⬅ Назад':
@@ -397,14 +393,21 @@ def others_menu(message):
 @bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_CHOSE_PIZZA_WEIGHT.value)
 def chose_weight_menu(message):
     weights = product.get_pizza_weight_by_title(db.get_cache(message.chat.id))
-    # for we in weights:
-    #     print(weights)
+
     for w in weights:
-        print(w['text'] + ' price: ' + w['price'])
         if message.text in w['text']:
-            print('YES '+w['text'])
-            bot.send_message(message.chat.id, str(w['price']))
-            break
+            product_ = product.get_pizza_by_title(db.get_cache(message.chat.id))
+            db.add_order_pizza(message.chat.id,
+                               db.get_cache(message.chat.id),
+                               product_['comp'],
+                               w['text'],
+                               int(product_['price']) + int(w['price']),
+                               product_['picture'])
+            bot.send_message(message.chat.id, '<b>' + db.get_cache(message.chat.id) + '</b>\n<b>Цена: ' +
+                             str(int(product_['price']) + int(w['price'])) + '</b> — ' + message.text,
+                             reply_markup=keyboards.chose_amount(),
+                             parse_mode='HTML')
+            states.set_state(message.chat.id, States.S_CHOSE_AMOUNT.value)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -413,18 +416,18 @@ def add_to_basket(call):
     if call.data == 'add_to_basket':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=keyboards.chose_amount())
-        bot.answer_callback_query(call.id, 'Выберите колличество')
+        bot.answer_callback_query(call.id, 'Выберите количество')
         states.set_state(call.message.chat.id, States.S_CHOSE_AMOUNT.value)
 
     elif call.data == 'add_to_basket_pizza':
         bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                       reply_markup=keyboards.chose_pizza_weight())
         bot.answer_callback_query(call.id, 'Выберите вес ⬇')
-        weights = []
-        for w in product.get_pizza_weight_by_title(db.get_cache(call.message.chat.id)):
-            weights.append(w['text'])
+        weights = product.get_pizza_weight_by_title(db.get_cache(call.message.chat.id))
         bot.send_message(call.message.chat.id, 'Выберите вес ⬇', reply_markup=keyboards.pizza_weights(weights))
         states.set_state(call.message.chat.id, States.S_CHOSE_PIZZA_WEIGHT.value)
+    elif call.data == 'chose_weight':
+        bot.answer_callback_query(call.id, 'Выберите вес')
 
     elif call.data == 'back_to_menu':
         bot.answer_callback_query(call.id, '⬅ Назад')
@@ -545,7 +548,10 @@ def add_to_basket(call):
             sum = 0
             description = ''
             for o in orders:
-                description = description + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5] * o[2]) + ' руб.; '
+                try:
+                    description = description + o[3] + ' — ' + str(o[2]) + ' шт. \n(' + o[7] + ') = ' + str(o[5] * o[2]) + ' руб.;'
+                except:
+                    description = description + o[3] + ' — ' + str(o[2]) + ' шт. = ' + str(o[5] * o[2]) + ' руб.;'
             for o in orders:
                 sum = sum + o[5] * o[2]
 
@@ -719,6 +725,8 @@ def payments_menu(message):
     elif message.text == '💳 Картой курьеру':
         pass
     elif message.text == '🖥 ROBOKASSA':
+        db.update_order_status(message.chat.id, db.get_cache(message.chat.id), 1)
+
         mrh_login = config.mrh_login
         mrh_pass1 = config.mrh_pass1
         inv_id = db.get_reg_order_by_id(message.chat.id, db.get_cache(message.chat.id))[0][0]
@@ -734,10 +742,13 @@ def payments_menu(message):
                         + str(mrh_login) + '&OutSum=' + str(out_summ) + '&InvoiceID=' \
                         + str(inv_id) + '&Description=' + str(inv_desc) + '&SignatureValue=' \
                         + str(crc.hexdigest()) + '&IsTest=' + str(is_test)
+
         key_robokassa = types.InlineKeyboardMarkup()
         robokassa_btn = types.InlineKeyboardButton(text='Оплатить', url=robokassa_url)
         key_robokassa.add(robokassa_btn)
-        bot.send_message(message.chat.id, '✅ Оплатите ваш заказ по ссылке', reply_markup=key_robokassa)
 
+        bot.send_message(message.chat.id, '✅ Оплатите ваш заказ по ссылке', reply_markup=key_robokassa)
+        sender.send_post(message.chat.id)
+        # TODO: CLEAR BASKET AFTER SEND POST
 
 bot.polling()
