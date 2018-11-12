@@ -394,20 +394,27 @@ def others_menu(message):
 def chose_weight_menu(message):
     weights = product.get_pizza_weight_by_title(db.get_cache(message.chat.id))
 
-    for w in weights:
-        if message.text in w['text']:
-            product_ = product.get_pizza_by_title(db.get_cache(message.chat.id))
-            db.add_order_pizza(message.chat.id,
-                               db.get_cache(message.chat.id),
-                               product_['comp'],
-                               w['text'],
-                               int(product_['price']) + int(w['price']),
-                               product_['picture'])
-            bot.send_message(message.chat.id, '<b>' + db.get_cache(message.chat.id) + '</b>\n<b>Цена: ' +
-                             str(int(product_['price']) + int(w['price'])) + '</b> — ' + message.text,
-                             reply_markup=keyboards.chose_amount(),
-                             parse_mode='HTML')
-            states.set_state(message.chat.id, States.S_CHOSE_AMOUNT.value)
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        db.delete_empty_orders(message.chat.id)
+        states.set_state(message.chat.id, States.S_MENU.value)
+
+    else:
+        for w in weights:
+            if message.text in w['text']:
+                product_ = product.get_pizza_by_title(db.get_cache(message.chat.id))
+                db.add_order_pizza(message.chat.id,
+                                   db.get_cache(message.chat.id),
+                                   product_['comp'],
+                                   w['text'],
+                                   int(product_['price']) + int(w['price']),
+                                   product_['picture'])
+                bot.send_message(message.chat.id, '<b>' + db.get_cache(message.chat.id) + '</b>\n<b>Цена: ' +
+                                 str(int(product_['price']) + int(w['price'])) + '</b> — ' + message.text,
+                                 reply_markup=keyboards.chose_amount(),
+                                 parse_mode='HTML')
+                states.set_state(message.chat.id, States.S_CHOSE_AMOUNT.value)
 
 
 @bot.callback_query_handler(func=lambda call: True)
