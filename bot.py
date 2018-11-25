@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import telebot
-import config
+
 import product
 import sender
 import states
@@ -14,8 +14,43 @@ from config import States
 from messages import Messages
 from telebot import types
 
+import flask
+
+import config
+
+import time
 
 bot = telebot.TeleBot(config.token)
+
+#
+# WEBHOOK_HOST = 'localhost'
+# WEBHOOK_PORT = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
+# WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+#
+#
+# WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
+# WEBHOOK_URL_PATH = "/%s/" % (config.token)
+#
+#
+# app = flask.Flask(__name__)
+#
+#
+# # Empty webserver index, return nothing, just http 200
+# @app.route('/', methods=['GET', 'HEAD'])
+# def index():
+#     return '<b>Hello World</b>'
+#
+#
+# # Process webhook calls
+# @app.route('/', methods=['POST'])
+# def webhook():
+#     if flask.request.headers.get('content-type') == 'application/json':
+#         json_string = flask.request.get_data().decode('utf-8')
+#         update = telebot.types.Update.de_json(json_string)
+#         bot.process_new_updates([update])
+#         return ''
+#     else:
+#         flask.abort(403)
 
 
 @bot.message_handler(commands=['start', 'help'])
@@ -23,7 +58,6 @@ def cmd_start(message):
     bot.send_message(message.chat.id, Messages.WELCOME.value.format(message.chat.first_name),
                      reply_markup=keyboards.main_menu())
     states.set_state(message.chat.id, States.S_MAIN_MENU.value)
-    db.add_username(message.chat.id, message.chat.username)
 
 
 @bot.message_handler(commands=['menu'])
@@ -53,6 +87,8 @@ def main_menu(message):
     elif message.text == '📥 Корзина':
         bot.send_message(message.chat.id, messages.basket(message.chat.id), parse_mode='HTML',
                          reply_markup=keyboards.basket())
+    elif message.text == '🛎 Заказы':
+        bot.send_message(message.chat.id, messages.orders_history(message.chat.id), parse_mode='HTML')
     else:
         bot.send_message(message.chat.id, 'Неизвесная команда!\n'
                                           'Попробуйте /start или /help')
@@ -107,8 +143,7 @@ def pizza_menu(message):
                 img = open('cache/pizza_two.jpg', 'rb')
 
             product_ = product.get_pizza_by_title(message.text)
-
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.pizza_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket_pizza())
             img.close()
@@ -147,7 +182,7 @@ def burger_menu(message):
                 img = open('cache/burger_two.jpg', 'rb')
 
             product_ = product.get_burger_by_title(message.text)
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -190,7 +225,7 @@ def drinks_menu(message):
                 img = open('cache/drinks_two.jpg', 'rb')
 
             product_ = product.get_drinks_by_title(message.text)
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -233,7 +268,7 @@ def pasta_menu(message):
                 img = open('cache/pasta_two.jpg', 'rb')
 
             product_ = product.get_pasta_by_title(message.text)
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -276,7 +311,7 @@ def salad_menu(message):
                 img = open('cache/salad_two.jpg', 'rb')
 
             product_ = product.get_salad_by_title(message.text)
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -319,7 +354,7 @@ def soup_menu(message):
                 img = open('cache/soup_two.jpg', 'rb')
 
             product_ = product.get_soup_by_title(message.text)
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -362,7 +397,7 @@ def others_menu(message):
                 img = open('cache/other_two.jpg', 'rb')
 
             product_ = product.get_others_by_title(message.text)
-            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.keyboard_hide)
+            bot.send_message(message.chat.id, 'Ваш продукт: ', reply_markup=keyboards.back_keyboard())
             bot.send_photo(message.chat.id, img, messages.product_data(product_), parse_mode='HTML',
                            reply_markup=keyboards.add_to_basket())
             img.close()
@@ -410,6 +445,7 @@ def chose_weight_menu(message):
                                    w['text'],
                                    int(product_['price']) + int(w['price']),
                                    product_['picture'])
+                bot.send_message(message.chat.id, 'Выбор количества ⬇', reply_markup=keyboards.back_keyboard())
                 bot.send_message(message.chat.id, '<b>' + db.get_cache(message.chat.id) + '</b>\n<b>Цена: ' +
                                  str(int(product_['price']) + int(w['price'])) + '</b> — ' + message.text,
                                  reply_markup=keyboards.chose_amount(),
@@ -433,6 +469,7 @@ def add_to_basket(call):
         weights = product.get_pizza_weight_by_title(db.get_cache(call.message.chat.id))
         bot.send_message(call.message.chat.id, 'Выберите вес ⬇', reply_markup=keyboards.pizza_weights(weights))
         states.set_state(call.message.chat.id, States.S_CHOSE_PIZZA_WEIGHT.value)
+
     elif call.data == 'chose_weight':
         bot.answer_callback_query(call.id, 'Выберите вес')
 
@@ -461,7 +498,10 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
         elif call.data == '2':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 2
@@ -469,7 +509,10 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
         elif call.data == '3':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 3
@@ -477,7 +520,10 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
         elif call.data == '4':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 4
@@ -485,7 +531,10 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
         elif call.data == '5':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 5
@@ -493,7 +542,10 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
         elif call.data == '6':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 6
@@ -501,14 +553,20 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
         elif call.data == '7':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 7
             db.edit_order_amount(call.message.chat.id, title, sum)
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
         elif call.data == '8':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 8
@@ -516,14 +574,20 @@ def add_to_basket(call):
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
         elif call.data == '9':
             sum = db.get_orders_by_chat_id_and_title(call.message.chat.id, title)[0][2] + 9
             db.edit_order_amount(call.message.chat.id, title, sum)
             bot.edit_message_reply_markup(call.message.chat.id, call.message.message_id,
                                           reply_markup=keyboards.add_to_basket())
             bot.answer_callback_query(call.id, '✅ Успешно добавлено в корзину')
-            states.set_state(call.message.chat.id, States.S_MENU.value)
+            bot.send_message(call.message.chat.id, '✅ Успешно добавлено в корзину\n\n'
+                                                   'Вы уже можете оформить ваш заказ, кликнув на кнопку "📥 Корзина"',
+                             reply_markup=keyboards.main_menu())
+            states.set_state(call.message.chat.id, States.S_MAIN_MENU.value)
 
     elif call.data == 'clear_basket':
         db.clear_basket(call.message.chat.id)
@@ -564,6 +628,18 @@ def add_to_basket(call):
 
             db.add_reg_order(call.message.chat.id, description, sum)
             db.set_cache(call.message.chat.id, db.get_reg_orders(call.message.chat.id)[-1][0])
+
+
+@bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_CHOSE_AMOUNT.value)
+def back_btn(message):
+    if message.text == '⬅ Назад':
+        bot.send_message(message.chat.id, 'Выберите раздел, чтобы вывести список блюд 👇🏻',
+                         reply_markup=keyboards.categories())
+        db.delete_empty_orders(message.chat.id)
+        states.set_state(message.chat.id, States.S_MENU.value)
+    else:
+        bot.send_message(message.chat.id, 'Неизвесная команда!\n'
+                                          'Попробуйте /start или /help')
 
 
 @bot.message_handler(func=lambda message: states.get_current_state(message.chat.id) == States.S_DELIVERY.value)
@@ -727,10 +803,23 @@ def payments_menu(message):
     elif message.text == '💵 Наличными курьеру':
         db.update_order_status(message.chat.id, db.get_cache(message.chat.id), 1)
         bot.send_message(message.chat.id, '✅ Ваш заказ оформлен!\n'
-                                          '👨‍💻 С вами скоро свяжется наш сотредник.')
-        sender.send_post(message.chat.id)
+                                          '👨‍💻 С вами скоро свяжется наш сотрудник.',
+                         reply_markup = keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+
+        sender.send_post(message.chat.id, 'Наличными курьеру')
+        db.clear_basket(message.chat.id)
+
     elif message.text == '💳 Картой курьеру':
-        pass
+        db.update_order_status(message.chat.id, db.get_cache(message.chat.id), 1)
+        bot.send_message(message.chat.id, '✅ Ваш заказ оформлен!\n'
+                                          '👨‍💻 С вами скоро свяжется наш сотрудник.',
+                         reply_markup = keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
+
+        sender.send_post(message.chat.id, 'Картой курьеру')
+        db.clear_basket(message.chat.id)
+
     elif message.text == '🖥 ROBOKASSA':
         db.update_order_status(message.chat.id, db.get_cache(message.chat.id), 1)
 
@@ -755,7 +844,22 @@ def payments_menu(message):
         key_robokassa.add(robokassa_btn)
 
         bot.send_message(message.chat.id, '✅ Оплатите ваш заказ по ссылке', reply_markup=key_robokassa)
-        sender.send_post(message.chat.id)
-        # TODO: CLEAR BASKET AFTER SEND POST
+        bot.send_message(message.chat.id, '🏠 Главное меню', reply_markup=keyboards.main_menu())
+        states.set_state(message.chat.id, States.S_MAIN_MENU.value)
 
-bot.polling()
+        sender.send_post(message.chat.id, 'ROBOKASSA')
+        db.clear_basket(message.chat.id)
+
+bot.polling(none_stop=True)
+# # Remove webhook, it fails sometimes the set if there is a previous webhook
+# bot.remove_webhook()
+#
+# time.sleep(0.1)
+#
+# # Set webhook
+# bot.set_webhook(url='https://c49d7c72.ngrok.io')
+#
+# # Start flask server
+# app.run(host=WEBHOOK_LISTEN,
+#         port=WEBHOOK_PORT,
+#         debug=True)

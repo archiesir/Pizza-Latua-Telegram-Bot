@@ -3,7 +3,25 @@
 import pymysql
 import config
 import os
+from datetime import *
 
+
+def update_datatime(chat_id, order_id):
+    connection = pymysql.connect(host='localhost',
+                                 user='root',
+                                 password='',
+                                 db='test_time',
+                                 charset='utf8')
+    cursor = connection.cursor()
+
+    sql = "UPDATE time SET datatime = \'{}\' WHERE chat_id = \'{}\' AND id = \'{}\'".format(datatime, chat_id, order_id)
+
+    cursor.execute(sql)
+
+    connection.commit()
+    connection.close()
+
+update_datatime()
 
 def get_all_users():
     connection = pymysql.connect(host=config.db_host,
@@ -259,7 +277,7 @@ def add_geoposition_reg_order(chat_id, order_id, geoposition):
                                  db=config.db_name,
                                  charset='utf8')
     cursor = connection.cursor()
-    sql = "UPDATE reg_orders SET geopisition = {} WHERE chat_id = \'{}\' AND id = \'{}\'".format(str(geoposition), chat_id, order_id)
+    sql = "UPDATE reg_orders SET geopisition = \'{}\' WHERE chat_id = \'{}\' AND id = \'{}\'".format(str(geoposition), chat_id, order_id)
     cursor.execute(sql)
 
     connection.commit()

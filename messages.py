@@ -3,6 +3,7 @@
 from enum import Enum
 
 import db
+import product
 
 
 def product_data(product):
@@ -20,19 +21,24 @@ def product_data(product):
     return output
 
 
-def pizza_data(product):
-    title = product['title']
-    price = product['price']
-    gram = product['gram']
+def pizza_data(info):
+    title = info['title']
+    price = info['price']
+    gram = info['gram']
 
-    if not product['comp']:
+    weights = product.get_pizza_weight_by_title(title)
+    prices = ''
+    for w in weights:
+        prices = prices + str(w['text'] + ' - ' + str(int(price) + int(w['price'])) + ' руб.\n')
+
+    if not info['comp']:
         output = '<b>{}</b>\n\n' \
                  '<b>Цена: {} руб.</b>'.format(title, price)
     else:
-        comp = product['comp']
+        comp = info['comp']
         output = '<b>{}</b>\n\n' \
                  '{}\n\n' \
-                 '<b>Цена: {} руб. — {} гр.</b>'.format(title, comp, price, gram)
+                 '<b>{}</b>'.format(title, comp, prices)
     return output
 
 

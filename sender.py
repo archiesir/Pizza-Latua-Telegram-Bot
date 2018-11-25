@@ -6,7 +6,7 @@ from email.mime.text import MIMEText
 import db
 
 
-def send_post(chat_id):
+def send_post(chat_id, pay):
     FROM = 'archieruin@gmail.com'
     TO = 'seg4wq@gmail.com'
     username = 'archieruin@gmail.com'
@@ -26,14 +26,15 @@ def send_post(chat_id):
     msg = MIMEMultipart()
     msg['From'] = FROM
     msg['To'] = TO
-    msg['Subject'] = "НОВЫЙ ЗАКАЗ!!!"
+    msg['Subject'] = "НОВЫЙ ЗАКАЗ!!! №" + str(id)
 
     body = 'Сумма заказа: {} руб.\n\n' \
+           'Оплата: {}\n\n' \
            'Номер телефона: {}\n\n' \
            'Доставка: {}\n\n' \
            'Товар:\n' \
            '{}\n\n' \
-           ''.format(sum, phone_number, delivery, desc)
+           ''.format(sum, pay, phone_number, delivery, desc)
     msg.attach(MIMEText(body, 'plain'))
 
     server.starttls()

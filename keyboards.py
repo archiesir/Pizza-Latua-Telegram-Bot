@@ -41,9 +41,7 @@ def pizza():
 def add_to_basket_pizza():
     key_basket = types.InlineKeyboardMarkup()
     basket_btn = types.InlineKeyboardButton(text='📥 Добавить пиццу в корзину', callback_data='add_to_basket_pizza')
-    back_btn = types.InlineKeyboardButton(text='⬅ Назад', callback_data='back_to_menu')
     key_basket.add(basket_btn)
-    key_basket.add(back_btn)
     return key_basket
 
 
@@ -56,10 +54,10 @@ def chose_pizza_weight():
 
 def pizza_weights(grams):
     key_pizza_gram = types.ReplyKeyboardMarkup(True, True)
+    key_pizza_gram.add('⬅ Назад')
     for gram in grams:
         btn_gram = types.KeyboardButton(text=gram['text'])
         key_pizza_gram.add(btn_gram)
-    key_pizza_gram.add('⬅ Назад')
     return key_pizza_gram
 
 
@@ -144,9 +142,7 @@ def others():
 def add_to_basket():
     key_basket = types.InlineKeyboardMarkup()
     basket_btn = types.InlineKeyboardButton(text='📥 Добавить в корзину', callback_data='add_to_basket')
-    back_btn = types.InlineKeyboardButton(text='⬅ Назад', callback_data='back_to_menu')
     key_basket.add(basket_btn)
-    key_basket.add(back_btn)
     return key_basket
 
 
@@ -161,13 +157,11 @@ def chose_amount():
     seven_btn = types.InlineKeyboardButton(text='7', callback_data='7')
     eight_btn = types.InlineKeyboardButton(text='8', callback_data='8')
     nine_btn = types.InlineKeyboardButton(text='9', callback_data='9')
-    chose_btn = types.InlineKeyboardButton(text='Выберите колличество', callback_data='chose_amount')
-    back_btn = types.InlineKeyboardButton(text='⬅ Назад', callback_data='back')
+    chose_btn = types.InlineKeyboardButton(text='Выберите количество', callback_data='chose_amount')
     chose_amount_key.add(chose_btn)
     chose_amount_key.add(one_btn, two_btn,three_btn)
     chose_amount_key.add(four_btn, five_btn, six_btn)
     chose_amount_key.add(seven_btn, eight_btn, nine_btn)
-    chose_amount_key.add(back_btn)
     return chose_amount_key
 
 
