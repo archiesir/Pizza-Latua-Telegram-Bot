@@ -23,7 +23,7 @@ def get_pizza_titles():
     titles = []
     html = requests.get(pizza_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-1").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -40,7 +40,7 @@ def get_pizza_by_title(title):
     find_title = title
     html = requests.get(pizza_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-1").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -93,7 +93,7 @@ def get_pizza_weight_by_title(title):
     weights = []
     html = requests.get(pizza_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-1").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -120,7 +120,7 @@ def get_burger_titles():
     titles = []
     html = requests.get(burger_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-77").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -137,7 +137,7 @@ def get_burger_by_title(title):
     find_title = title
     html = requests.get(burger_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-77").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -186,7 +186,7 @@ def get_drinks_titles():
     titles = []
     html = requests.get(drinks_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-2").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -203,7 +203,7 @@ def get_drinks_by_title(title):
     find_title = title
     html = requests.get(drinks_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-2").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -252,7 +252,7 @@ def get_pasta_titles():
     titles = []
     html = requests.get(pasta_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-3").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -269,7 +269,7 @@ def get_pasta_by_title(title):
     find_title = title
     html = requests.get(pasta_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-3").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -318,7 +318,7 @@ def get_salad_titles():
     titles = []
     html = requests.get(salad_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-4").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -335,7 +335,7 @@ def get_salad_by_title(title):
     find_title = title
     html = requests.get(salad_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-4").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -384,7 +384,7 @@ def get_soup_titles():
     titles = []
     html = requests.get(soup_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-5").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -401,7 +401,7 @@ def get_soup_by_title(title):
     find_title = title
     html = requests.get(soup_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-5").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -450,7 +450,7 @@ def get_others_titles():
     titles = []
     html = requests.get(others_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-6").find_all('div', class_='food-col')
 
     for food in food_col:
@@ -467,7 +467,7 @@ def get_others_by_title(title):
     find_title = title
     html = requests.get(others_url).text
 
-    soup = BeautifulSoup(html, 'lxml')
+    soup = BeautifulSoup(html, 'html.parser')
     food_col = soup.find('div', id="menu-good-6").find_all('div', class_='food-col')
 
     for food in food_col:

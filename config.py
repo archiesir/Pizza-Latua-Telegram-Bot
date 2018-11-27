@@ -19,7 +19,7 @@ IsTest = 1
 # DATABASE SETTINGS
 db_host = "localhost"
 db_user = "root"
-db_password = ""
+db_password = "3423"
 db_name = "shop_bot"
 
 

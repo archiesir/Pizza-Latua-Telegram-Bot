@@ -33,12 +33,12 @@ def pizza_data(info):
 
     if not info['comp']:
         output = '<b>{}</b>\n\n' \
-                 '<b>Цена: {} руб.</b>'.format(title, price)
+                 '<b>{}</b>'.format(title, prices.replace('Диаметр ', 'Ø='))
     else:
         comp = info['comp']
         output = '<b>{}</b>\n\n' \
                  '{}\n\n' \
-                 '<b>{}</b>'.format(title, comp, prices)
+                 '<b>{}</b>'.format(title, comp, prices.replace('Диаметр ', 'Ø='))
     return output
 
 
@@ -68,7 +68,7 @@ def basket(chat_id):
 class Messages(Enum):
     WELCOME = 'Добро пожаловать, {}. \n' \
               'Мы рады приветсвовать вас в нашем боте для доставки еды. \nВ случае ' \
-              'возникновения вопросов, звониите по номеру \n+99 999 999 99 99 '
+              'возникновения вопросов, звониите по номеру \n8 (3532) 579-779 '
 
     DELIVERY = '✅ <b>Быстрая доставка 30-60 минут</b>\n' \
                '✅ Мы контролируем скорость за счёт запасных курьеров\n' \

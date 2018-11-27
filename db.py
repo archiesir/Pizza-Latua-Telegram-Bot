@@ -20,8 +20,7 @@ def update_datatime(chat_id, order_id):
 
     connection.commit()
     connection.close()
-
-update_datatime()
+    
 
 def get_all_users():
     connection = pymysql.connect(host=config.db_host,

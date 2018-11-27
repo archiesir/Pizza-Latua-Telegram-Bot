@@ -22,14 +22,17 @@ import time
 
 bot = telebot.TeleBot(config.token)
 
-#
-# WEBHOOK_HOST = 'localhost'
+# WEBHOOK COMMENT
+# WEBHOOK_HOST = '46.229.215.56'
 # WEBHOOK_PORT = 8443  # 443, 80, 88 or 8443 (port need to be 'open')
-# WEBHOOK_LISTEN = '0.0.0.0'  # In some VPS you may need to put here the IP addr
+# WEBHOOK_LISTEN = '46.229.215.56'  # In some VPS you may need to put here the IP addr
 #
 #
 # WEBHOOK_URL_BASE = "https://%s:%s" % (WEBHOOK_HOST, WEBHOOK_PORT)
 # WEBHOOK_URL_PATH = "/%s/" % (config.token)
+#
+# WEBHOOK_SSL_CERT = './webhook_cert.pem'  # Path to the ssl certificate
+# WEBHOOK_SSL_PRIV = './webhook_pkey.pem'  # Path to the ssl private key
 #
 #
 # app = flask.Flask(__name__)
@@ -42,7 +45,7 @@ bot = telebot.TeleBot(config.token)
 #
 #
 # # Process webhook calls
-# @app.route('/', methods=['POST'])
+# @app.route(WEBHOOK_URL_PATH, methods=['POST'])
 # def webhook():
 #     if flask.request.headers.get('content-type') == 'application/json':
 #         json_string = flask.request.get_data().decode('utf-8')
@@ -87,8 +90,6 @@ def main_menu(message):
     elif message.text == '📥 Корзина':
         bot.send_message(message.chat.id, messages.basket(message.chat.id), parse_mode='HTML',
                          reply_markup=keyboards.basket())
-    elif message.text == '🛎 Заказы':
-        bot.send_message(message.chat.id, messages.orders_history(message.chat.id), parse_mode='HTML')
     else:
         bot.send_message(message.chat.id, 'Неизвесная команда!\n'
                                           'Попробуйте /start или /help')
@@ -750,7 +751,7 @@ def time_menu(message):
         states.set_state(message.chat.id, States.S_DELIVERY.value)
     else:
         db.add_time(message.chat.id, db.get_cache(message.chat.id), message.text)
-        bot.send_message(message.chat.id, '<b>Оставьте комментарии к заказу и адресу</b>\n'
+        bot.send_message(message.chat.id, '<b>Оставьте комментарии к заказу или адресу</b>\n'
                                           'Например: точное время доставки, номер'
                                           'подъезда, код домофона, номер этажа,'
                                           'ориентиры, а также пожелания к заказу 👇🏻',
@@ -767,7 +768,7 @@ def comments_menu(message):
         db.delete_false_reg_orders(message.chat.id)
     elif message.text == '⬅ Назад':
         bot.send_message(message.chat.id, '<b>Условия и описание доставки:</b>\n'
-                                          'Отдел доставки работает ежедневно с 11:00 до 22:30\n'
+                                          'Отдел доставки работает ежедневно с 10:00 до 23:30\n'
                                           'Заберите свой заказ <b>самостоятельно</b> или выберите <b>доставку</b> 👇🏻',
                          parse_mode='HTML',
                          reply_markup=keyboards.check_delivery())
@@ -776,7 +777,7 @@ def comments_menu(message):
         bot.send_message(message.chat.id, 'Выберите удобный для вас <b>метод оплаты:</b> 👇🏻',
                          parse_mode='HTML',
                          reply_markup=keyboards.payments_key())
-        db.add_comments(message.chat.id, db.get_cache(message.chat.id), 'Не ооставлленно')
+        db.add_comments(message.chat.id, db.get_cache(message.chat.id), 'Не оставлленно')
         states.set_state(message.chat.id, States.S_PAYMENTS.value)
     else:
         bot.send_message(message.chat.id, 'Выберите удобный для вас <b>метод оплаты:</b> 👇🏻',
@@ -793,7 +794,7 @@ def payments_menu(message):
         states.set_state(message.chat.id, States.S_MAIN_MENU.value)
 
     elif message.text == '⬅ Назад':
-        bot.send_message(message.chat.id, '<b>Оставьте комментарии к заказу и адресу</b>\n'
+        bot.send_message(message.chat.id, '<b>Оставьте комментарии к заказу или адресу</b>\n'
                                           'Например: точное время доставки, номер'
                                           'подъезда, код домофона, номер этажа,'
                                           'ориентиры, а также пожелания к заказу 👇🏻',
@@ -851,15 +852,17 @@ def payments_menu(message):
         db.clear_basket(message.chat.id)
 
 bot.polling(none_stop=True)
-# # Remove webhook, it fails sometimes the set if there is a previous webhook
+# Remove webhook, it fails sometimes the set if there is a previous webhook
 # bot.remove_webhook()
 #
 # time.sleep(0.1)
 #
 # # Set webhook
-# bot.set_webhook(url='https://c49d7c72.ngrok.io')
+# bot.set_webhook(url=WEBHOOK_URL_BASE + WEBHOOK_URL_PATH,
+#                 certificate=open(WEBHOOK_SSL_CERT, 'r'))
 #
 # # Start flask server
 # app.run(host=WEBHOOK_LISTEN,
 #         port=WEBHOOK_PORT,
+#         ssl_context=(WEBHOOK_SSL_CERT, WEBHOOK_SSL_PRIV),
 #         debug=True)

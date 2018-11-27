@@ -8,9 +8,13 @@ keyboard_hide = types.ReplyKeyboardRemove()
 
 
 def main_menu():
+    # key_main_menu = types.ReplyKeyboardMarkup(True)
+    # key_main_menu.row('🍴 Меню', '📥 Корзина')
+    # key_main_menu.row('🛎 Заказы', '✏ Информация')
+    # key_main_menu.row('🚀 Доставка', '☎ Контакты')
     key_main_menu = types.ReplyKeyboardMarkup(True)
-    key_main_menu.row('🍴 Меню', '📥 Корзина')
-    key_main_menu.row('🛎 Заказы', '✏ Информация')
+    key_main_menu.row('🍴 Меню')
+    key_main_menu.row('📥 Корзина', '✏ Информация')
     key_main_menu.row('🚀 Доставка', '☎ Контакты')
     return key_main_menu
 
