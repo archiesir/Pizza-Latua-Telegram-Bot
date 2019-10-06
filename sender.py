@@ -7,10 +7,10 @@ import db
 
 
 def send_post(chat_id, pay):
-    FROM = 'archieruin@gmail.com'
+    FROM = 'asdadssdfsdfuin@gmail.com'
     TO = 'seg4wq@gmail.com'
-    username = 'archieruin@gmail.com'
-    password = 'ktjxvzodnstgotkf'
+    username = 'arcasdasduin@gmail.com'
+    password = 'ktjsdfsdfsdfgotkf'
     server = smtplib.SMTP('smtp.gmail.com:587')
 
     id = db.get_cache(chat_id)
